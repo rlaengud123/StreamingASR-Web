@@ -5,7 +5,7 @@ let socket: WebSocket;
 
 const connectWebSocket = () => {
   // WebSocket 연결을 시도합니다.
-  socket = new WebSocket('ws://10.17.23.228:8088/api/v1/stream/overlap');
+  socket = new WebSocket('ws://localhost:8080/api/v1/stream/overlap');
 
   socket.onopen = () => {
     console.log('웹소켓 연결 성공');
@@ -28,6 +28,7 @@ const connectWebSocket = () => {
 interface Message {
   message_id: string;
   content: string;
+  receivedAt: string;
 }
 
 
@@ -50,15 +51,15 @@ const Home = () => {
     const handleMessage = (event: MessageEvent<string>): void => {
       const messageData: string = event.data;
       const [messageId, messageContent] = messageData.split(':', 2);
-      const newMessage: Message = { message_id: messageId, content: messageContent };
+      const receivedAt = new Date().toLocaleTimeString(); // 현재 시간을 문자열로 기록
+      const newMessage: Message = { message_id: messageId, content: messageContent, receivedAt: receivedAt };
 
       setMessages((prevMessages) => {
         const existingIndex = prevMessages.findIndex((message) => message.message_id === newMessage.message_id);
         if (existingIndex > -1) {
-          // 새로운 메시지가 기존 메시지보다 길이가 짧은 경우 업데이트하지 않습니다.
           const existingMessage = prevMessages[existingIndex];
           if (newMessage.content.length < existingMessage.content.length) {
-            return prevMessages; // 변경 없이 기존 메시지 유지
+            return prevMessages;
           }
 
           const updatedMessages = [...prevMessages];
@@ -141,6 +142,7 @@ const Home = () => {
           >
             <Text fontWeight="bold">Message ID {message.message_id}:</Text>
             <Text mt={2}>{message.content}</Text>
+            <Text fontSize="sm" color="gray.500">{message.receivedAt}</Text>
           </Box>
         ))}
 
