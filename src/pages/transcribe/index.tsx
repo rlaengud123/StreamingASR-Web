@@ -177,7 +177,7 @@ const Home = () => {
               <Button colorScheme="blue">뒤로 가기</Button>
             </Link>
             <Button
-              colorScheme={connected ? "blue" : "gray"}
+              colorScheme={isRecording ? "red" : connected ? "blue" : "gray"}
               disabled={!connected}
               onClick={handleButtonClick}
             >
