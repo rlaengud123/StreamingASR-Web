@@ -162,7 +162,7 @@ const Home = () => {
   }
 
   return (
-    <>
+    <Stack alignItems={"center"}>
       <VStack spacing={4} width={"full"}>
         <Box p={5} shadow="md" borderWidth="1px">
           <Text>
@@ -186,28 +186,41 @@ const Home = () => {
           </Stack>
         </Box>
       </VStack>
-      <HStack
+      <VStack
         spacing={4}
-        width={"full"}
+        width={"80%"}
         margin={"20px"}
         justifyContent={"center"}
       >
-        <VStack width="40%">
-          {messages.ko.map((message, index) => (
-            <MessageComponent
-              key={message.message_id}
-              message={message}
-              ref={index === messages.ko.length - 1 ? latestMessageRef : null} // 마지막 KO 메시지에 ref 할당
-            />
-          ))}
-        </VStack>
-        <VStack width="40%">
-          {messages.en.map((message, index) => (
-            <MessageComponent key={message.message_id} message={message} />
-          ))}
-        </VStack>
-      </HStack>
-    </>
+        {messages.ko.map((koMessage, index) => {
+          const enMessage = messages.en[index];
+          return (
+            <HStack
+              key={koMessage.message_id}
+              width="full"
+              spacing={4}
+              alignItems={"start"}
+            >
+              {/* 한국어 메시지 */}
+              <Box width="50%">
+                <MessageComponent
+                  message={koMessage}
+                  ref={
+                    index === messages.ko.length - 1 ? latestMessageRef : null
+                  }
+                />
+              </Box>
+
+              {messages.en[index] && (
+                <Box width="50%">
+                  <MessageComponent message={enMessage} />
+                </Box>
+              )}
+            </HStack>
+          );
+        })}
+      </VStack>
+    </Stack>
   );
 };
 
