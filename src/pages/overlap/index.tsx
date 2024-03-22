@@ -1,54 +1,22 @@
 import { Box, Button, Link, Stack, Text, VStack } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-let socket: WebSocket;
+import { Message } from "@/interface/Message";
+import useAudioRecording from "@/hooks/useAudioRecording";
+import useWebSocket from "@/hooks/useWebSocket";
 
-interface Message {
-  message_id: string;
-  content: string;
-  receivedAt: string;
-}
-
-const Home = () => {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+const OverlapHome = () => {
+  const { socket, connected } = useWebSocket(
+    "ws://localhost:8080/api/v1/stream/overlap",
+  );
+  const { isRecording, startRecording, stopRecording } =
+    useAudioRecording(socket);
   const [messages, setMessages] = useState<Message[]>([]);
   const latestMessageRef = useRef<HTMLDivElement | null>(null);
-  const [connected, setConnected] = useState<boolean>(false);
-
-  const connectWebSocket = () => {
-    // WebSocket 연결을 시도합니다.
-    socket = new WebSocket("ws://localhost:8080/api/v1/stream/overlap");
-
-    socket.onopen = () => {
-      console.log("웹소켓 연결 성공");
-      setConnected(true);
-    };
-
-    socket.onmessage = event => {
-      console.log("서버로부터 메시지 수신:", event.data);
-    };
-
-    socket.onerror = error => {
-      console.error("웹소켓 에러:", error);
-    };
-
-    socket.onclose = () => {
-      console.log("웹소켓 연결 끊김, 재연결 시도...");
-      setTimeout(connectWebSocket, 3000); // 3초 후 재연결 시도
-    };
-  };
 
   useEffect(() => {
-    connectWebSocket();
-    return () => {
-      // 컴포넌트가 언마운트될 때 WebSocket 연결을 종료합니다.
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        socket.close();
-      }
-    };
-  }, []);
+    if (!socket) return;
 
-  useEffect(() => {
     const handleMessage = (event: MessageEvent<string>): void => {
       const messageData: string = event.data;
       const [messageId, messageContent] = messageData.split(":", 2);
@@ -83,63 +51,29 @@ const Home = () => {
       });
     };
 
-    if (socket) {
-      socket.onmessage = handleMessage;
-    }
+    socket.onmessage = handleMessage;
 
     return () => {
       if (socket) {
         socket.onmessage = null;
       }
     };
-  }, []);
+  }, [socket]);
 
   useEffect(() => {
-    // Scroll the latest message into view when messages update
     if (latestMessageRef.current) {
       latestMessageRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]); // Dependency array includes messages to trigger on update
+  }, [messages]);
 
-  // Home 컴포넌트 내부에 추가
-  const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const audioContext = new AudioContext();
-    await audioContext.audioWorklet.addModule("modules/audio-processor.js"); // AudioWorkletProcessor 로드
-    const source = audioContext.createMediaStreamSource(stream);
-
-    const processor = new AudioWorkletNode(audioContext, "pcm-processor");
-    source.connect(processor);
-    processor.connect(audioContext.destination);
-
-    // AudioWorkletProcessor에서 전송된 데이터를 받음
-    processor.port.onmessage = event => {
-      const audioData = event.data;
-      // 이 부분에서 audioData를 웹소켓을 통해 서버로 전송합니다.
-      if (socket.readyState === WebSocket.OPEN) {
-        socket.send(audioData);
-      }
-    };
-    setIsRecording(true);
-  };
-
-  const stopRecording = () => {
-    // Close the WebSocket connection when stopping the recording
-    if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.close();
-      console.log("웹소켓 연결 종료");
-    }
-    setIsRecording(false);
-  };
-
-  function handleButtonClick() {
-    if (!connected) return; // 연결되지 않았다면 아무 동작도 하지 않음
+  const handleButtonClick = () => {
+    if (!connected) return;
     if (isRecording) {
       stopRecording();
     } else {
       startRecording();
     }
-  }
+  };
 
   return (
     <>
@@ -175,12 +109,12 @@ const Home = () => {
             borderWidth="1px"
             borderRadius="md"
             backgroundColor="blue.50"
-            ref={index === messages.length - 1 ? latestMessageRef : null} // Assign ref to last message
+            ref={index === messages.length - 1 ? latestMessageRef : null}
           >
             <Text fontWeight="bold">Message ID {message.message_id}:</Text>
             <Text mt={2}>{message.content}</Text>
             <Text fontSize="sm" color="gray.500">
-              {message.receivedAt}
+              Received at: {message.receivedAt}
             </Text>
           </Box>
         ))}
@@ -189,4 +123,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default OverlapHome;
