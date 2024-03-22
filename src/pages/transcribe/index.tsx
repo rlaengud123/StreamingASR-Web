@@ -1,17 +1,9 @@
-import {
-  Box,
-  Button,
-  HStack,
-  Link,
-  Stack,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
+import { Box, HStack, Stack, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 
-import AudioPlayer from "@/components/AudioPlayer";
 import { Message } from "@/interface/Message";
-import MessageComponent from "@/components/MessageComponent";
+import MessageComponent from "@/components/Message";
+import RecordingBox from "@/components/RecordingBox";
 import useAudioRecording from "@/hooks/useAudioRecording";
 import useWebSocket from "@/hooks/useWebSocket";
 
@@ -97,30 +89,12 @@ const TranscribeHome = () => {
 
   return (
     <Stack alignItems="center">
-      <VStack spacing={4} width="full">
-        <Box p={5} shadow="md" borderWidth="1px">
-          <Text>
-            {isRecording
-              ? "녹음 중..."
-              : connected
-                ? "녹음 준비됨"
-                : "웹소켓 연결 불가"}
-          </Text>
-          <Stack direction="row">
-            <Link href="/">
-              <Button colorScheme="blue">뒤로 가기</Button>
-            </Link>
-            <Button
-              colorScheme={isRecording ? "red" : connected ? "blue" : "gray"}
-              disabled={!connected}
-              onClick={handleButtonClick}
-            >
-              {isRecording ? "녹음 중지" : "녹음 시작"}
-            </Button>
-          </Stack>
-          <AudioPlayer audioURL={audioURL} />
-        </Box>
-      </VStack>
+      <RecordingBox
+        isRecording={isRecording}
+        connected={connected}
+        handleButtonClick={handleButtonClick}
+        audioURL={audioURL}
+      />
       <VStack spacing={4} width="80%" margin="20px" justifyContent="center">
         {messages.ko.map((message, index) => (
           <HStack key={index} width="full" spacing={4} alignItems="start">

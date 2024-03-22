@@ -1,8 +1,8 @@
-import { Box, Button, Link, Stack, Text, VStack } from "@chakra-ui/react";
+import { Box, Stack, Text } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 
-import AudioPlayer from "@/components/AudioPlayer";
 import { Message } from "@/interface/Message";
+import RecordingBox from "@/components/RecordingBox";
 import useAudioRecording from "@/hooks/useAudioRecording";
 import useWebSocket from "@/hooks/useWebSocket";
 
@@ -78,30 +78,12 @@ const OverlapHome = () => {
 
   return (
     <>
-      <VStack spacing={4} width={"full"}>
-        <Box p={5} shadow="md" borderWidth="1px">
-          <Text>
-            {isRecording
-              ? "녹음 중..."
-              : connected
-                ? "녹음 준비됨"
-                : "웹소켓 연결 불가"}
-          </Text>
-          <Stack direction={"row"}>
-            <Link href="/">
-              <Button colorScheme="blue">뒤로 가기</Button>
-            </Link>
-            <Button
-              colorScheme={isRecording ? "red" : connected ? "blue" : "gray"}
-              disabled={!connected}
-              onClick={handleButtonClick}
-            >
-              {isRecording ? "녹음 중지" : "녹음 시작"}
-            </Button>
-          </Stack>
-          <AudioPlayer audioURL={audioURL} />
-        </Box>
-      </VStack>
+      <RecordingBox
+        isRecording={isRecording}
+        connected={connected}
+        handleButtonClick={handleButtonClick}
+        audioURL={audioURL}
+      />
       <Stack spacing={4} marginX={"30px"} marginY={"20px"}>
         {messages.map((message, index) => (
           <Box
