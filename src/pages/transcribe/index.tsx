@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 
+import AudioPlayer from "@/components/AudioPlayer";
 import { Message } from "@/interface/Message";
 import MessageComponent from "@/components/MessageComponent";
 import useAudioRecording from "@/hooks/useAudioRecording";
@@ -23,7 +24,7 @@ const TranscribeHome = () => {
   const fullUrl = `ws://localhost:8080/api/v1/stream/transcribe?${params}`;
 
   const { socket, connected } = useWebSocket(fullUrl);
-  const { isRecording, startRecording, stopRecording } =
+  const { isRecording, startRecording, stopRecording, audioURL } =
     useAudioRecording(socket);
   const [messages, setMessages] = useState<{ ko: Message[]; en: Message[] }>({
     ko: [],
@@ -117,6 +118,7 @@ const TranscribeHome = () => {
               {isRecording ? "녹음 중지" : "녹음 시작"}
             </Button>
           </Stack>
+          <AudioPlayer audioURL={audioURL} />
         </Box>
       </VStack>
       <VStack spacing={4} width="80%" margin="20px" justifyContent="center">

@@ -1,6 +1,7 @@
 import { Box, Button, Link, Stack, Text, VStack } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 
+import AudioPlayer from "@/components/AudioPlayer";
 import { Message } from "@/interface/Message";
 import useAudioRecording from "@/hooks/useAudioRecording";
 import useWebSocket from "@/hooks/useWebSocket";
@@ -9,7 +10,7 @@ const OverlapHome = () => {
   const { socket, connected } = useWebSocket(
     "ws://localhost:8080/api/v1/stream/overlap",
   );
-  const { isRecording, startRecording, stopRecording } =
+  const { isRecording, startRecording, stopRecording, audioURL } =
     useAudioRecording(socket);
   const [messages, setMessages] = useState<Message[]>([]);
   const latestMessageRef = useRef<HTMLDivElement | null>(null);
@@ -98,6 +99,7 @@ const OverlapHome = () => {
               {isRecording ? "녹음 중지" : "녹음 시작"}
             </Button>
           </Stack>
+          <AudioPlayer audioURL={audioURL} />
         </Box>
       </VStack>
       <Stack spacing={4} marginX={"30px"} marginY={"20px"}>
