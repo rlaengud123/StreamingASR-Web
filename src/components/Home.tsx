@@ -23,9 +23,9 @@ const HomeComponent = () => {
     const params = new URLSearchParams();
 
     params.append("translate_flag", translateFlag.toString());
+    params.append("src_lang", srcLang);
 
     if (translateFlag) {
-      params.append("src_lang", srcLang);
       params.append("tgt_lang", tgtLang);
     }
 

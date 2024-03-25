@@ -7,18 +7,14 @@ import React from "react";
 const MessageDisplay: React.FC<{
   messages: MessagesState;
   translateFlag: boolean;
-}> = ({ messages }, translateFlag) => {
+}> = ({ messages, translateFlag }) => {
   const latestMessageRef = React.useRef(null); // 가장 최근 메시지를 위한 ref
 
   return (
     <VStack spacing={4} width="80%" margin="20px" justifyContent="center">
       {messages.original.map((message, index) => (
         <HStack key={index} width="full" spacing={4} alignItems="start">
-          <Box
-            width={translateFlag ? "full" : "50%"}
-            maxW={translateFlag ? "50%" : "full"}
-            flex={1}
-          >
+          <Box width={translateFlag ? "50%" : "full"}>
             <MessageComponent
               message={message}
               ref={
@@ -26,7 +22,7 @@ const MessageDisplay: React.FC<{
               }
             />
           </Box>
-          {messages.translated[index] && (
+          {translateFlag && messages.translated[index] && (
             <Box width="50%">
               <MessageComponent message={messages.translated[index]} />
             </Box>
