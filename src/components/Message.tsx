@@ -23,7 +23,7 @@ const MessageComponent = React.forwardRef<
     >
       <Text fontWeight="bold">Message ID {message.message_id}:</Text>
       <Text mt={2}>
-        {message.language == "KO" ? message.transcript : message.translate}
+        {message.transcript ? message.transcript : message.translate}
       </Text>
       <Text fontSize="sm" color="gray.500">
         {message.receivedAt}

@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 
-const useAudioRecording = (socket: WebSocket | null) => {
+import { MessagesState } from "@/interface/Message";
+import React from "react";
+
+const useAudioRecording = (
+  socket: WebSocket | null,
+  setMessages: React.Dispatch<React.SetStateAction<MessagesState>>,
+) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
@@ -61,6 +67,10 @@ const useAudioRecording = (socket: WebSocket | null) => {
       console.log("웹소켓 연결 종료");
     }
     setIsRecording(false);
+    setMessages({
+      original: [],
+      translated: [],
+    });
   };
 
   return { isRecording, startRecording, stopRecording, audioURL };

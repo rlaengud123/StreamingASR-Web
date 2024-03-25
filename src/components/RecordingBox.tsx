@@ -7,6 +7,8 @@ const RecordingBox: FC<RecordingComponentProps> = ({
   isRecording,
   connected,
   handleButtonClick,
+  wsUrl,
+  connectWebSocket,
   audioURL,
 }) => {
   return (
@@ -17,14 +19,21 @@ const RecordingBox: FC<RecordingComponentProps> = ({
             ? "녹음 중..."
             : connected
               ? "녹음 준비됨"
-              : "웹소켓 연결 불가"}
+              : "웹소켓 연결 필요"}
         </Text>
         <Stack direction="row">
           <Link href="/">
             <Button colorScheme="blue">뒤로 가기</Button>
           </Link>
           <Button
-            colorScheme={isRecording ? "red" : connected ? "blue" : "gray"}
+            colorScheme={connected ? "blue" : "gray"}
+            disabled={connected}
+            onClick={() => connectWebSocket(wsUrl)}
+          >
+            {connected ? "웹소켓 연결 됨" : "웹소켓 연결"}
+          </Button>
+          <Button
+            colorScheme={isRecording ? "red" : connected ? "green" : "gray"}
             disabled={!connected}
             onClick={handleButtonClick}
           >

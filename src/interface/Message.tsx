@@ -1,5 +1,5 @@
 export interface Message {
-  language: "KO" | "EN";
+  language: "ko" | "en";
   message_id: string;
   transcript?: string;
   translate?: string;
@@ -7,6 +7,6 @@ export interface Message {
 }
 
 export interface MessagesState {
-  KO: Message[];
-  EN: Message[];
+  original: Message[];
+  translated: Message[];
 }

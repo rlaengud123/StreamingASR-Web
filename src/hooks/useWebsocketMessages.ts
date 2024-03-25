@@ -1,20 +1,11 @@
+import { Message, MessagesState } from "@/interface/Message";
 import { useEffect, useState } from "react";
 
-interface Message {
-  language: "KO" | "EN";
-  message_id: string;
-  transcript?: string;
-  translate?: string;
-  receivedAt: string;
-}
-
-interface MessagesState {
-  KO: Message[];
-  EN: Message[];
-}
-
-function useWebSocketMessages(socket: WebSocket | null): MessagesState {
-  const [messages, setMessages] = useState<MessagesState>({ KO: [], EN: [] });
+function useWebSocketMessages(socket: WebSocket | null) {
+  const [messages, setMessages] = useState<MessagesState>({
+    original: [],
+    translated: [],
+  });
 
   useEffect(() => {
     if (!socket) return;
@@ -29,25 +20,36 @@ function useWebSocketMessages(socket: WebSocket | null): MessagesState {
       };
 
       setMessages(prevMessages => {
-        const language = newMessage.language;
-        const existingIndex = prevMessages[language].findIndex(
+        const messageType = newMessage.transcript ? "original" : "translated";
+        const existingIndex = prevMessages[messageType].findIndex(
           message => message.message_id === newMessage.message_id,
         );
 
         if (existingIndex > -1) {
-          const existingMessage = prevMessages[language][existingIndex];
+          const existingMessage = prevMessages[messageType][existingIndex];
+          const isOriginal = messageType === "original";
+
           if (
-            newMessage.transcript &&
+            isOriginal &&
             existingMessage.transcript &&
+            newMessage.transcript &&
             newMessage.transcript.length < existingMessage.transcript.length
           ) {
-            // 이전 메시지가 더 길면 업데이트하지 않음
+            // 이전 원문이 더 길면 업데이트하지 않음
+            return prevMessages;
+          } else if (
+            !isOriginal &&
+            existingMessage.translate &&
+            newMessage.translate &&
+            newMessage.translate.length < existingMessage.translate.length
+          ) {
+            // 이전 번역문이 더 길면 업데이트하지 않음
             return prevMessages;
           }
 
           // 메시지 업데이트
           const updatedMessages: MessagesState = { ...prevMessages };
-          updatedMessages[language][existingIndex] = {
+          updatedMessages[messageType][existingIndex] = {
             ...existingMessage,
             ...newMessage,
           };
@@ -56,7 +58,7 @@ function useWebSocketMessages(socket: WebSocket | null): MessagesState {
           // 새 메시지 추가
           const updatedMessages: MessagesState = {
             ...prevMessages,
-            [language]: [...prevMessages[language], newMessage].sort(
+            [messageType]: [...prevMessages[messageType], newMessage].sort(
               (a, b) => parseInt(a.message_id) - parseInt(b.message_id),
             ),
           };
@@ -74,7 +76,7 @@ function useWebSocketMessages(socket: WebSocket | null): MessagesState {
     };
   }, [socket]);
 
-  return messages;
+  return { messages, setMessages };
 }
 
 export default useWebSocketMessages;

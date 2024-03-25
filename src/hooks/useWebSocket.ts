@@ -1,12 +1,17 @@
 // hooks/useWebSocket.ts
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-const useWebSocket = (url: string) => {
+const useWebSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
 
-  useEffect(() => {
-    const connectWebSocket = () => {
+  // URL을 인자로 받아 해당 URL로 웹소켓을 연결하는 함수
+  const connectWebSocket = useCallback(
+    (url: string) => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        return;
+      }
+
       const newSocket = new WebSocket(url);
 
       newSocket.onopen = () => {
@@ -19,23 +24,25 @@ const useWebSocket = (url: string) => {
       };
 
       newSocket.onclose = () => {
-        console.log("웹소켓 연결 끊김, 재연결 시도...");
-        setTimeout(connectWebSocket, 3000);
+        console.log("웹소켓 연결 끊김");
+        setConnected(false);
+        // 재연결 로직을 제거하거나 필요에 따라 조정합니다.
       };
 
       setSocket(newSocket);
-    };
+    },
+    [socket],
+  ); // socket을 의존성 배열에 추가합니다.
 
-    connectWebSocket();
-
+  useEffect(() => {
     return () => {
       if (socket && socket.readyState === WebSocket.OPEN) {
         socket.close();
       }
     };
-  }, []);
+  }, [socket]);
 
-  return { socket, connected, setConnected };
+  return { socket, connected, setConnected, connectWebSocket };
 };
 
 export default useWebSocket;
