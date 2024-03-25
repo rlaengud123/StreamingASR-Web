@@ -71,7 +71,11 @@ const HomeComponent = () => {
         connectWebSocket={connectWebSocket}
         audioURL={audioURL}
       />
-      <MessageDisplay messages={messages} translateFlag={translateFlag} />
+      <MessageDisplay
+        messages={messages}
+        translateFlag={translateFlag}
+        latestMessageRef={latestMessageRef}
+      />
     </Stack>
   );
 };

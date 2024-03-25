@@ -1,15 +1,14 @@
 import { Box, HStack, VStack } from "@chakra-ui/react";
+import React, { LegacyRef } from "react";
 
 import MessageComponent from "./Message";
 import { MessagesState } from "@/interface/Message";
-import React from "react";
 
 const MessageDisplay: React.FC<{
   messages: MessagesState;
   translateFlag: boolean;
-}> = ({ messages, translateFlag }) => {
-  const latestMessageRef = React.useRef(null); // 가장 최근 메시지를 위한 ref
-
+  latestMessageRef: LegacyRef<HTMLDivElement>;
+}> = ({ messages, translateFlag, latestMessageRef }) => {
   return (
     <VStack spacing={4} width="80%" margin="20px" justifyContent="center">
       {messages.original.map((message, index) => (
