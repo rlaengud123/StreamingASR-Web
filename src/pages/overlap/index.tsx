@@ -1,10 +1,11 @@
-import { Box, Stack, Text } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 
-import { Message } from "@/interface/Message";
+import MessageComponent from "@/components/Message";
 import RecordingBox from "@/components/RecordingBox";
+import { Stack } from "@chakra-ui/react";
 import useAudioRecording from "@/hooks/useAudioRecording";
 import useWebSocket from "@/hooks/useWebSocket";
+import useWebSocketMessages from "@/hooks/useWebsocketMessages";
 
 const OverlapHome = () => {
   const { socket, connected } = useWebSocket(
@@ -12,54 +13,8 @@ const OverlapHome = () => {
   );
   const { isRecording, startRecording, stopRecording, audioURL } =
     useAudioRecording(socket);
-  const [messages, setMessages] = useState<Message[]>([]);
   const latestMessageRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleMessage = (event: MessageEvent<string>): void => {
-      const messageData: string = event.data;
-      const [messageId, messageContent] = messageData.split(":", 2);
-      const receivedAt = new Date().toLocaleTimeString(); // 현재 시간을 문자열로 기록
-      const newMessage: Message = {
-        message_id: messageId,
-        content: messageContent,
-        receivedAt: receivedAt,
-      };
-
-      setMessages(prevMessages => {
-        const existingIndex = prevMessages.findIndex(
-          message => message.message_id === newMessage.message_id,
-        );
-        if (existingIndex > -1) {
-          const existingMessage = prevMessages[existingIndex];
-          if (newMessage.content.length < existingMessage.content.length) {
-            return prevMessages;
-          }
-
-          const updatedMessages = [...prevMessages];
-          updatedMessages[existingIndex] = {
-            ...updatedMessages[existingIndex],
-            ...newMessage,
-          };
-          return updatedMessages;
-        } else {
-          return [...prevMessages, newMessage].sort(
-            (a, b) => parseInt(a.message_id) - parseInt(b.message_id),
-          );
-        }
-      });
-    };
-
-    socket.onmessage = handleMessage;
-
-    return () => {
-      if (socket) {
-        socket.onmessage = null;
-      }
-    };
-  }, [socket]);
+  const messages = useWebSocketMessages(socket);
 
   useEffect(() => {
     if (latestMessageRef.current) {
@@ -85,22 +40,12 @@ const OverlapHome = () => {
         audioURL={audioURL}
       />
       <Stack spacing={4} marginX={"30px"} marginY={"20px"}>
-        {messages.map((message, index) => (
-          <Box
+        {messages.KO.map((message, index) => (
+          <MessageComponent
             key={index}
-            p={4}
-            shadow="sm"
-            borderWidth="1px"
-            borderRadius="md"
-            backgroundColor="blue.50"
-            ref={index === messages.length - 1 ? latestMessageRef : null}
-          >
-            <Text fontWeight="bold">Message ID {message.message_id}:</Text>
-            <Text mt={2}>{message.content}</Text>
-            <Text fontSize="sm" color="gray.500">
-              Received at: {message.receivedAt}
-            </Text>
-          </Box>
+            message={message}
+            ref={index === messages.KO.length - 1 ? latestMessageRef : null}
+          />
         ))}
       </Stack>
     </>

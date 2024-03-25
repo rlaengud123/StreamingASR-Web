@@ -22,7 +22,9 @@ const MessageComponent = React.forwardRef<
       ref={ref ? ref : null} // 여기에 ref 할당
     >
       <Text fontWeight="bold">Message ID {message.message_id}:</Text>
-      <Text mt={2}>{message.content}</Text>
+      <Text mt={2}>
+        {message.language == "KO" ? message.transcript : message.translate}
+      </Text>
       <Text fontSize="sm" color="gray.500">
         {message.receivedAt}
       </Text>
