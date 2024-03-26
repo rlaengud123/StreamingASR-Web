@@ -14,6 +14,7 @@ const HomeComponent = () => {
   const path = router.pathname;
   const lastSegment = path.split("/").pop();
   const baseUrl = `ws://localhost:8080/api/v1/stream/${lastSegment}`;
+  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [translateFlag, setTranslateFlag] = useState(true);
   const [srcLang, setSrcLang] = useState("ko");
   const [tgtLang, setTgtLang] = useState("en");
@@ -37,10 +38,13 @@ const HomeComponent = () => {
     setWsUrl(`${baseUrl}?${params}`);
   }, [translateFlag, srcLang, tgtLang, baseUrl]);
 
-  const { socket, connected, connectWebSocket } = useWebSocket();
+  const { socket, connected, connectWebSocket } = useWebSocket(isRecording);
   const { messages, setMessages } = useWebSocketMessages(socket);
-  const { isRecording, startRecording, stopRecording, audioURL } =
-    useAudioRecording(socket, setMessages);
+  const { startRecording, stopRecording, audioURL } = useAudioRecording(
+    socket,
+    setMessages,
+    setIsRecording,
+  );
   const latestMessageRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

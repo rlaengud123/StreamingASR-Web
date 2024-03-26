@@ -6,8 +6,8 @@ import React from "react";
 const useAudioRecording = (
   socket: WebSocket | null,
   setMessages: React.Dispatch<React.SetStateAction<MessagesState>>,
+  setIsRecording: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {
-  const [isRecording, setIsRecording] = useState<boolean>(false);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
     null,
@@ -73,7 +73,7 @@ const useAudioRecording = (
     });
   };
 
-  return { isRecording, startRecording, stopRecording, audioURL };
+  return { startRecording, stopRecording, audioURL };
 };
 
 export default useAudioRecording;
