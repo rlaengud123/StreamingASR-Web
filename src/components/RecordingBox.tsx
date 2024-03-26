@@ -23,7 +23,7 @@ const RecordingBox: FC<RecordingComponentProps> = ({
         </Text>
         <Stack direction="row">
           <Link href="/">
-            <Button colorScheme="blue">뒤로 가기</Button>
+            <Button colorScheme="orange">뒤로 가기</Button>
           </Link>
           <Button
             colorScheme={connected ? "blue" : "gray"}

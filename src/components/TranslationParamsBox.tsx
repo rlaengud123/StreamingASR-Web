@@ -14,8 +14,6 @@ interface TranslationParamsBoxProps {
   setTranslateFlag: React.Dispatch<React.SetStateAction<boolean>>;
   srcLang: string;
   setSrcLang: React.Dispatch<React.SetStateAction<string>>;
-  tgtLang: string;
-  setTgtLang: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const TranslationParamsBox: React.FC<TranslationParamsBoxProps> = ({
@@ -23,8 +21,6 @@ const TranslationParamsBox: React.FC<TranslationParamsBoxProps> = ({
   setTranslateFlag,
   srcLang,
   setSrcLang,
-  tgtLang,
-  setTgtLang,
 }) => {
   return (
     <Box p={4}>
@@ -49,18 +45,6 @@ const TranslationParamsBox: React.FC<TranslationParamsBoxProps> = ({
           >
             <option value="ko">Korean</option>
             <option value="en">English</option>
-          </Select>
-        </FormControl>
-
-        <FormControl>
-          <FormLabel htmlFor="tgt-lang">Target Language:</FormLabel>
-          <Select
-            id="tgt-lang"
-            value={tgtLang}
-            onChange={e => setTgtLang(e.target.value)}
-          >
-            <option value="en">English</option>
-            <option value="ko">Korean</option>
           </Select>
         </FormControl>
       </VStack>

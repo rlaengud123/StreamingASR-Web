@@ -26,6 +26,11 @@ const HomeComponent = () => {
     params.append("src_lang", srcLang);
 
     if (translateFlag) {
+      if (srcLang === "ko") {
+        setTgtLang("en");
+      } else {
+        setTgtLang("ko");
+      }
       params.append("tgt_lang", tgtLang);
     }
 
@@ -60,8 +65,6 @@ const HomeComponent = () => {
         setTranslateFlag={setTranslateFlag}
         srcLang={srcLang}
         setSrcLang={setSrcLang}
-        tgtLang={tgtLang}
-        setTgtLang={setTgtLang}
       />
       <RecordingBox
         isRecording={isRecording}
