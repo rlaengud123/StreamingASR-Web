@@ -26,23 +26,11 @@ const useWebSocket = () => {
       newSocket.onclose = () => {
         console.log("웹소켓 연결 끊김");
         setConnected(false);
-        console.log("웹소켓 재 연결 시도...");
-        reconnectWebSocket(url);
       };
 
       setSocket(newSocket);
     },
     [socket],
-  );
-  // 웹소켓을 재연결하기 위한 로직
-  const reconnectWebSocket = useCallback(
-    (url: string) => {
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        return;
-      }
-      setTimeout(() => connectWebSocket(url), 3000); // 3초 후 재연결
-    },
-    [socket, connectWebSocket],
   );
 
   useEffect(() => {

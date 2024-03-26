@@ -50,7 +50,6 @@ const useAudioRecording = (
     processor.port.onmessage = (event: MessageEvent) => {
       const audioData = event.data;
       if (socket && socket.readyState === WebSocket.OPEN) {
-        const sendedAt = new Date().toLocaleTimeString();
         socket.send(audioData);
       }
     };
