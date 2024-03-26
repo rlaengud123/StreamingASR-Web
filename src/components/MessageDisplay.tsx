@@ -21,9 +21,11 @@ const MessageDisplay: React.FC<{
               }
             />
           </Box>
-          {translateFlag && messages.translated[index] && (
+          {translateFlag && (
             <Box width="50%">
-              <MessageComponent message={messages.translated[index]} />
+              {messages.translated[index] && (
+                <MessageComponent message={messages.translated[index]} />
+              )}
             </Box>
           )}
         </HStack>
