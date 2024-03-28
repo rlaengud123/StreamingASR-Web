@@ -12,6 +12,12 @@ const Home = () => {
         <Link href="/transcribe" passHref>
           <Button colorScheme="teal">Go to Transcribe</Button>
         </Link>
+        <Link href="/auto_overlap" passHref>
+          <Button colorScheme="teal">Go to Language Detect Overlap</Button>
+        </Link>
+        <Link href="/auto_transcribe" passHref>
+          <Button colorScheme="teal">Go to Language Detect Transcribe</Button>
+        </Link>
       </Stack>
     </Container>
   );
