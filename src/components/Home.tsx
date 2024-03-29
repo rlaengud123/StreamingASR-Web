@@ -13,7 +13,9 @@ const HomeComponent = () => {
   const router = useRouter();
   const path = router.pathname;
   const lastSegment = path.split("/").pop();
-  const baseUrl = `ws://${process.env.WEBSOCKET_URL}:${process.env.WEBSOCKET_PORT}/api/v1/stream/${lastSegment}`;
+  const autoFlag = lastSegment?.includes("auto_");
+  const cleanedLastSegment = lastSegment?.replace("auto_", "");
+  const baseUrl = `ws://${process.env.WEBSOCKET_URL}:${process.env.WEBSOCKET_PORT}/api/v1/stream/${cleanedLastSegment}`;
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [translateFlag, setTranslateFlag] = useState(true);
   const [srcLang, setSrcLang] = useState("ko");
@@ -22,23 +24,25 @@ const HomeComponent = () => {
 
   useEffect(() => {
     const params = new URLSearchParams();
-
     params.append("translate_flag", translateFlag.toString());
-    params.append("src_lang", srcLang);
 
-    if (translateFlag) {
-      if (srcLang === "ko") {
-        setTgtLang("en");
-      } else {
-        setTgtLang("ko");
+    if (!autoFlag) {
+      params.append("src_lang", srcLang);
+
+      if (translateFlag) {
+        if (srcLang === "ko") {
+          setTgtLang("en");
+        } else {
+          setTgtLang("ko");
+        }
+        params.append("tgt_lang", tgtLang);
       }
-      params.append("tgt_lang", tgtLang);
     }
 
     setWsUrl(`${baseUrl}?${params}`);
-  }, [translateFlag, srcLang, tgtLang, baseUrl]);
+  }, [autoFlag, translateFlag, srcLang, tgtLang, baseUrl]);
 
-  const { socket, connected, connectWebSocket } = useWebSocket(isRecording);
+  const { socket, connected, connectWebSocket } = useWebSocket();
   const { messages, setMessages } = useWebSocketMessages(socket);
   const { startRecording, stopRecording, audioURL } = useAudioRecording(
     socket,
@@ -53,6 +57,16 @@ const HomeComponent = () => {
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      return;
+    }
+    if (isRecording) {
+      console.log("웹소켓 재연결 시도 중...");
+      setTimeout(() => connectWebSocket(wsUrl), 3000); // 3초 후 재연결
+    }
+  }, [socket, connectWebSocket]);
+
   const handleButtonClick = () => {
     if (!connected) return;
     if (isRecording) {
@@ -64,12 +78,14 @@ const HomeComponent = () => {
 
   return (
     <Stack alignItems="center">
-      <TranslationParamsBox
-        translateFlag={translateFlag}
-        setTranslateFlag={setTranslateFlag}
-        srcLang={srcLang}
-        setSrcLang={setSrcLang}
-      />
+      {!autoFlag && (
+        <TranslationParamsBox
+          translateFlag={translateFlag}
+          setTranslateFlag={setTranslateFlag}
+          srcLang={srcLang}
+          setSrcLang={setSrcLang}
+        />
+      )}
       <RecordingBox
         isRecording={isRecording}
         connected={connected}

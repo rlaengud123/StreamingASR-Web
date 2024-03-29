@@ -1,7 +1,7 @@
 // hooks/useWebSocket.ts
 import { useCallback, useEffect, useState } from "react";
 
-const useWebSocket = (isRecording: boolean) => {
+const useWebSocket = () => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState<boolean>(false);
 
@@ -26,25 +26,11 @@ const useWebSocket = (isRecording: boolean) => {
       newSocket.onclose = () => {
         console.log("웹소켓 연결 끊김");
         setConnected(false);
-        if (isRecording) {
-          reconnectWebSocket(url);
-          console.log("웹소켓 재연결 시도 중...");
-        }
       };
 
       setSocket(newSocket);
     },
     [socket],
-  );
-
-  const reconnectWebSocket = useCallback(
-    (url: string) => {
-      if (socket && socket.readyState === WebSocket.OPEN) {
-        return;
-      }
-      setTimeout(() => connectWebSocket(url), 3000); // 3초 후 재연결
-    },
-    [socket, connectWebSocket],
   );
 
   useEffect(() => {

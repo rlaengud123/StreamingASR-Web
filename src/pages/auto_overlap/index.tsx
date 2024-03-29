@@ -1,4 +1,4 @@
-import HomeComponent from "@/components/AutoHome";
+import HomeComponent from "@/components/Home";
 import React from "react";
 
 const AutoOvPage = () => {
