@@ -13,7 +13,7 @@ const HomeComponent = () => {
   const router = useRouter();
   const path = router.pathname;
   const lastSegment = path.split("/").pop();
-  const baseUrl = `ws://43.202.10.76:8080/api/v1/stream/${lastSegment}`;
+  const baseUrl = `ws://${process.env.WEBSOCKET_URL}:${process.env.WEBSOCKET_PORT}/api/v1/stream/${lastSegment}`;
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [translateFlag, setTranslateFlag] = useState(true);
   const [srcLang, setSrcLang] = useState("ko");
