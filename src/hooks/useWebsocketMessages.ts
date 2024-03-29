@@ -25,6 +25,31 @@ function useWebSocketMessages(socket: WebSocket | null) {
           message => message.message_id === newMessage.message_id,
         );
 
+        // 새 메시지 인덱스 채우기 로직 시작
+        const lastMessageId = prevMessages[messageType].length
+          ? parseInt(
+              prevMessages[messageType][prevMessages[messageType].length - 1]
+                .message_id,
+            )
+          : -1;
+        const newMessageId = parseInt(newMessage.message_id);
+        if (newMessageId > lastMessageId + 1) {
+          // 빠진 인덱스에 대한 빈 메시지 생성
+          const missingMessages: Message[] = [];
+          for (let id = lastMessageId + 1; id < newMessageId; id++) {
+            missingMessages.push({
+              language: newMessage.language,
+              message_id: id.toString(),
+              receivedAt: "",
+            });
+          }
+          prevMessages[messageType] = [
+            ...prevMessages[messageType],
+            ...missingMessages,
+          ];
+        }
+        // 새 메시지 인덱스 채우기 로직 끝
+
         if (existingIndex > -1) {
           const existingMessage = prevMessages[messageType][existingIndex];
           const isOriginal = messageType === "original";
